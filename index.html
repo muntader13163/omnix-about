@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Security: Content Security Policy (CSP) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' ws: wss: https://generativelanguage.googleapis.com;">
+    
+    <title>OMNIX SwiftScan</title>
+    <!-- Fonts: Cairo (New), Noto Kufi Arabic, Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 RTL -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- Icons (Bootstrap Icons) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    
+    <style>
+        :root {
+            /* Omnix Corporate Palette - Refined */
+            --ox-primary: #1e3a8a;       /* Richer Navy Blue */
+            --ox-primary-dark: #0f172a;  /* Darker Navy */
+            --ox-accent: #fbbf24;        /* Warm Gold */
+            --ox-accent-hover: #d97706;  /* Deep Gold */
+            --ox-success: #10b981;       /* Emerald Green */
+            --ox-danger: #ef4444;        /* Red */
+            --ox-bg: #f8fafc;            /* Very Light Blue-Grey */
+            --ox-card: #ffffff;          /* Pure White */
+            --ox-text-main: #1e293b;     /* Slate 800 */
+            --ox-text-muted: #64748b;    /* Slate 500 */
+            --ox-border: #e2e8f0;        /* Slate 200 */
+            
+            --radius-main: 12px;
+            --radius-sm: 6px;
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            --titlebar-height: 38px;
+            --header-height: 56px;
+        }
+
+        /* --- Global Reset & Base --- */
+        body {
+            font-family: 'Cairo', 'Noto Kufi Arabic', sans-serif;
+            background-color: var(--ox-bg);
+            color: var(--ox-text-main);
+            height: 100vh;
+            overflow: hidden; 
+            user-select: none;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        input, textarea, .selectable-text {
+            user-select: text;
+        }
+
+        /* --- Custom Modal --- */
+        #ox-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .ox-modal {
+            background: white;
+            width: 420px;
+            max-width: 90%;
+            border-radius: var(--radius-main);
+            box-shadow: var(--shadow-hover);
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid var(--ox-border);
+        }
+        .ox-modal-header {
+            background: var(--ox-primary);
+            color: white;
+            padding: 16px 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ox-modal-body {
+            padding: 24px;
+            color: var(--ox-text-main);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .ox-modal-footer {
+            padding: 16px 24px;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--ox-border);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- Title Bar --- */
+        .title-bar {
+            height: var(--titlebar-height);
+            background: var(--ox-primary-dark);
+            display: flex;
+            align-items: center;
+            padding: 0;
+            -webkit-app-region: drag;
+            color: white;
+            z-index: 1000;
+            direction: ltr; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .title-bar-center {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            font-family: 'Noto Kufi Arabic', sans-serif; font-size: 0.8rem; opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+        .title-bar-title {
+            font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 15px; direction: rtl;
+        }
+        .title-bar-logo {
+            height: 18px; width: auto; 
+        }
+        .window-controls { display: flex; -webkit-app-region: no-drag; height: 100%; }
+        .control-btn {
+            width: 46px; height: 100%; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer;
+            transition: background 0.2s;
+        }
+        .control-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .control-btn.close-btn:hover { background: var(--ox-danger); }
+
+        /* --- Layout --- */
+        .app-container {
+            display: flex; flex-direction: column; flex: 1; overflow: hidden;
+            /* Height is managed by flex container */
+        }
+        
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .top-nav {
+            height: var(--header-height);
+            background: white;
+            display: flex; align-items: center; padding: 0 24px; gap: 32px;
+            border-bottom: 1px solid var(--ox-border);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .nav-brand { display: flex; align-items: center; gap: 12px; color: var(--ox-primary); font-weight: 800; font-size: 1.2rem; margin-left: 24px; }
+        .nav-menu { display: flex; gap: 8px; flex: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px;
+            color: var(--ox-text-muted); transition: var(--transition); cursor: pointer; font-size: 0.9rem; font-weight: 600;
+        }
+        .nav-item:hover { background: #f1f5f9; color: var(--ox-primary); }
+        .nav-item.active { background: #eff6ff; color: var(--ox-primary); }
+        .nav-item.active i { color: var(--ox-primary); }
+
+        .content-area {
+            flex: 1; background: var(--ox-bg); padding: 0; overflow: hidden; position: relative;
+            display: flex; flex-direction: column;
+        }
+
+        /* View Section */
+        .view-section { 
+            display: none; 
+            flex: 1; /* Occupy remaining space */
+            flex-direction: column; 
+            overflow: hidden; /* Prevent spillover */
+            animation: fadeIn 0.4s ease-out; 
+            gap: 16px; /* Gap between content and bottom actions */
+        }
+        .view-section.active { display: flex; }
+
+        .view-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 24px 20px 24px; /* Added bottom padding for physical separation */
+            overflow: hidden;
+            min-height: 0;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Scanner View Styles (New) --- */
+        .toolbar {
+            background: #fff;
+            box-shadow: var(--shadow-card);
+            padding: 12px 16px;
+            display: flex;
+            gap: 12px;
+            border-radius: var(--radius-main);
+            margin-bottom: 20px;
+            align-items: center;
+            border: 1px solid var(--ox-border);
+            flex-shrink: 0;
+        }
+        
+        .toolbar button {
+            transition: var(--transition);
+        }
+        .toolbar button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        /* Flex adjustments for workspace row */
+        .main-workspace .row {
+            flex: 1;
+            /* height: 100%; - Removed to let flex handle it */
+            min-height: 0;
+            display: flex;
+        }
+        
+        .main-workspace .col-md-6 {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%; /* Explicit height constraint */
+            overflow: hidden; /* Critical: Prevent column from growing with content */
+        }
+
+        /* Ensure passport viewer stays within bounds */
+        .passport-viewer {
+            position: relative;
+            background: #fff;
+            border-radius: var(--radius-main);
+            padding: 12px;
+            box-shadow: var(--shadow-card);
+            height: 100%; /* Force fixed height relative to parent */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--ox-border);
+            transition: var(--transition);
+            z-index: 50;
+        }
+        
+        .passport-viewer:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .preview-container {
+            flex: 1;
+            width: 100%;
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #cbd5e1;
+            transition: var(--transition);
+        }
+        .preview-container:hover {
+            border-color: var(--ox-primary);
+            background: #f1f5f9;
+        }
+        
+        /* Ensure image fits perfectly */
+        .preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            transform-origin: center center; /* Ensure zoom centers correctly */
+        }
+
+        /* Form Section */
+        .form-section {
+            background: #fff;
+            border-radius: var(--radius-main);
+            padding: 24px;
+            /* Add bottom padding for scroll comfort */
+            padding-bottom: 32px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--ox-border);
+            overflow-y: auto;
+            height: 100%; /* Force fixed height relative to parent */
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        /* Modern Scrollbar for Form */
+        .form-section::-webkit-scrollbar { width: 6px; }
+        .form-section::-webkit-scrollbar-track { background: transparent; }
+        .form-section::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .form-section::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .bottom-actions {
+            /* Flex item at bottom */
+            flex-shrink: 0;
+            background: #fff;
+            padding: 16px 24px;
+            border-top: 2px solid var(--ox-border); /* Thicker border for visual separation */
+            z-index: 100;
+            box-shadow: 0 -4px 10px -2px rgba(0, 0, 0, 0.05); /* Stronger shadow */
+            width: 100%;
+            /* Ensure stability */
+            min-height: 80px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative; /* Ensure z-index works */
+        }
+
+        /* Form Fields */
+        .form-label { font-size: 0.85rem; font-weight: 600; color: var(--ox-text-muted); margin-bottom: 6px; }
+        .form-control, .form-select {
+            border-radius: var(--radius-sm); border: 1px solid var(--ox-border); padding: 10px 14px; font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--ox-primary); 
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+            background-color: #fff;
+        }
+        .form-control:hover, .form-select:hover {
+            border-color: #cbd5e1;
+        }
+
+        .field-ok { border-color: #10b981 !important; background: #ecfdf5 !important; }
+        .field-warn { border-color: #f59e0b !important; background: #fffbeb !important; }
+        
+        @keyframes flashSuccess {
+            0% { background-color: rgba(16, 185, 129, 0.2); transform: scale(1.02); }
+            100% { background-color: #fff; transform: scale(1); }
+        }
+        .field-updated {
+            animation: flashSuccess 0.8s ease-out;
+        }
+
+        .copy-btn {
+            position: absolute; left: 10px; top: 36px; background: transparent; border: none; color: #94a3b8; cursor: pointer;
+            transition: var(--transition);
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .copy-btn:hover { color: var(--ox-primary); background: #f1f5f9; }
+
+        /* Buttons */
+        .btn-ox { padding: 10px 24px; border-radius: var(--radius-sm); font-weight: 600; border: none; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .btn-primary-ox { background: var(--ox-primary); color: white; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1); }
+        .btn-primary-ox:hover { background: var(--ox-primary-dark); color: white; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2); }
+        
+        .btn-accent-ox { background: var(--ox-accent); color: #000; }
+        
+        /* Status Bar */
+        .status-bar-fixed {
+            /* Now part of flex layout, no overlap */
+            height: 32px; 
+            background: white; 
+            border-top: 1px solid var(--ox-border);
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 24px; 
+            font-size: 0.75rem; 
+            color: var(--ox-text-muted);
+            box-shadow: 0 -1px 2px rgba(0,0,0,0.02);
+            flex-shrink: 0; /* Prevent shrinking */
+            z-index: 200;
+        }
+        .status-indicator { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,1); }
+        .dot.green { background: var(--ox-success); } .dot.red { background: var(--ox-danger); } .dot.orange { background: orange; }
+
+        .upload-zone { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; transition: var(--transition); }
+        .upload-placeholder i { transition: var(--transition); color: #cbd5e1 !important; }
+        .upload-zone:hover .upload-placeholder i { color: var(--ox-primary) !important; transform: scale(1.1); }
+    </style>
+</head>
+
+<body>
+
+    <!-- Title Bar -->
+    <div class="title-bar">
+        <div class="title-bar-section">
+            <div class="title-bar-title" style="direction: ltr;">
+                <img src="../assets/icon.svg" class="title-bar-logo" alt="Logo">
+                <span>OMNIX SwiftScan</span>
+            </div>
+        </div>
+        <div class="title-bar-center">
+            وَقُلِ اعْمَلُوا فَسَيَرَى اللَّهُ عَمَلَكُمْ وَرَسُولُهُ وَالْمُؤْمِنُونَ
+        </div>
+        <div class="window-controls" style="margin-left: auto;">
+            <button class="control-btn" id="btnMin"><i class="bi bi-dash-lg"></i></button>
+            <button class="control-btn" id="btnMax"><i class="bi bi-square"></i></button>
+            <button class="control-btn close-btn" id="btnClose"><i class="bi bi-x-lg"></i></button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <img src="../assets/icon.svg" height="24" width="24" alt="OMNIX">
+                <span>OMNIX</span>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item active" data-view="scanner">
+                    <i class="bi bi-upc-scan"></i> <span>ماسح الجوازات</span>
+                </div>
+                <div class="nav-item" data-view="history">
+                    <i class="bi bi-clock-history"></i> <span>سجل العمليات</span>
+                </div>
+                <div class="nav-item" data-view="settings">
+                    <i class="bi bi-gear-fill"></i> <span>الإعدادات</span>
+                </div>
+            </div>
+            <div class="text-white opacity-50 small">v9.2</div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="content-area">
+            
+            <!-- VIEW: SCANNER (Updated Layout) -->
+            <div id="view-scanner" class="view-section active">
+                
+                <div class="view-content">
+                    <!-- Toolbar -->
+                <div class="toolbar">
+                    <button id="btnSelectImage" class="btn-ox btn-primary-ox">
+                        <i class="bi bi-image"></i> اختيار صورة
+                    </button>
+                    <button id="btnScan" class="btn-ox btn-primary-ox">
+                        <i class="bi bi-printer"></i> مسح ضوئي
+                    </button>
+                    <button id="btnProcess" class="btn-ox btn-accent-ox">
+                        <i class="bi bi-magic"></i> تحليل الوثيقة
+                    </button>
+                    <button id="btnCopyJSON" class="btn-ox btn-outline-secondary d-none">
+                        <i class="bi bi-code-slash"></i> JSON
+                    </button>
+                </div>
+
+                <div class="container-fluid p-0 main-workspace">
+                    <div class="row g-3 w-100 m-0">
+                        
+                        <!-- Left: Image Viewer -->
+                        <div class="col-md-6 ps-0">
+                            <div class="passport-viewer">
+                                <div class="preview-container">
+                                    <div id="image-preview" class="upload-zone">
+                                        <div class="upload-placeholder text-center">
+                                            <i class="bi bi-cloud-arrow-up-fill text-muted opacity-25" style="font-size: 3rem;"></i>
+                                            <h5 class="mt-2 text-muted">اضغط أو اسحب الملف هنا</h5>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Zoom Controls -->
+                                    <div id="zoom-controls" class="d-none position-absolute bottom-0 end-0 m-3 d-flex gap-2 bg-white p-1 rounded shadow-sm border">
+                                        <button id="btnZoomIn" class="btn btn-sm btn-light" title="تكبير"><i class="bi bi-zoom-in"></i></button>
+                                        <button id="btnZoomOut" class="btn btn-sm btn-light" title="تصغير"><i class="bi bi-zoom-out"></i></button>
+                                        <button id="btnResetZoom" class="btn btn-sm btn-light" title="إعادة تعيين"><i class="bi bi-arrow-counterclockwise"></i></button>
+                                    </div>
+                                    
+                                    <input type="file" id="fileInput" accept="image/*" hidden>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Form -->
+                        <div class="col-md-6 pe-0">
+                            <div class="form-section">
+                                <form id="passportForm">
+                                    
+                                    <h5 class="mb-3 fw-bold text-primary">البيانات الأساسية</h5>
+                                    
+                                    <div class="mb-3 position-relative">
+                                        <label class="form-label">رقم الجواز</label>
+                                        <input type="text" id="p_num" class="form-control fw-bold field-ok">
+                                        <button type="button" class="copy-btn" data-copy-target="p_num"><i class="bi bi-copy"></i></button>
+                                    </div>
+
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-4 position-relative">
+                                            <label class="form-label">تاريخ الميلاد <span id="age-badge" class="validation-badge bg-secondary text-white d-none"></span></label>
+                                            <input type="text" id="dob" class="form-control" placeholder="YYYY/MM/DD">
+                                            <button type="button" class="copy-btn" data-copy-target="dob"><i class="bi bi-copy"></i></button>
+                                        </div>
+                                        <div class="col-md-4 position-relative">
+                                            <label class="form-label">تاريخ الإصدار</label>
+                                            <input type="text" id="doi" class="form-control" placeholder="YYYY/MM/DD">
+                                            <button type="button" class="copy-btn" data-copy-target="doi"><i class="bi bi-copy"></i></button>
+                                        </div>
+                                        <div class="col-md-4 position-relative">
+                                            <label class="form-label">تاريخ الانتهاء <span id="expiry-badge" class="validation-badge bg-warning text-dark d-none"></span></label>
+                                            <input type="text" id="doe" class="form-control field-warn" placeholder="YYYY/MM/DD">
+                                            <button type="button" class="copy-btn" data-copy-target="doe"><i class="bi bi-copy"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mt-4 mb-3 fw-bold text-primary">البيانات الشخصية (عربي)</h5>
+                                    
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label">الاسم الأول</label>
+                                            <input type="text" id="f1_ar" class="form-control">
+                                        </div>
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label">اسم الأب</label>
+                                            <input type="text" id="f2_ar" class="form-control">
+                                        </div>
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label">اسم الجد</label>
+                                            <input type="text" id="f3_ar" class="form-control">
+                                        </div>
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label">العائلة</label>
+                                            <input type="text" id="f4_ar" class="form-control">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 position-relative">
+                                        <label class="form-label">الاسم الكامل (عربي)</label>
+                                        <input type="text" id="full_name_ar" class="form-control bg-light" readonly>
+                                        <button type="button" class="copy-btn" data-copy-target="full_name_ar"><i class="bi bi-copy"></i></button>
+                                    </div>
+
+                                    <h5 class="mt-4 mb-3 fw-bold text-primary">البيانات الشخصية (English)</h5>
+                                    
+                                    <div class="row g-2 mb-3" style="direction: ltr;">
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label text-end w-100">First Name</label>
+                                            <input type="text" id="f1_en" class="form-control">
+                                        </div>
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label text-end w-100">Father Name</label>
+                                            <input type="text" id="f2_en" class="form-control">
+                                        </div>
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label text-end w-100">Grandfather</label>
+                                            <input type="text" id="f3_en" class="form-control">
+                                        </div>
+                                        <div class="col-md-3 position-relative">
+                                            <label class="form-label text-end w-100">Family Name</label>
+                                            <input type="text" id="f4_en" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3 position-relative">
+                                        <label class="form-label">Full Name (English)</label>
+                                        <input type="text" id="full_name_en" class="form-control bg-light" readonly style="direction: ltr; text-align: left;">
+                                        <button type="button" class="copy-btn" style="left: auto; right: 8px;" data-copy-target="full_name_en"><i class="bi bi-copy"></i></button>
+                                    </div>
+
+                                    <h5 class="mt-4 mb-3 fw-bold text-primary">معلومات إضافية</h5>
+                                    
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6 position-relative">
+                                            <label class="form-label">الجنسية</label>
+                                            <select id="nationality_ar" class="form-select"></select>
+                                        </div>
+                                        <div class="col-md-6 position-relative">
+                                            <label class="form-label">مكان الإصدار</label>
+                                            <select id="place_of_issue" class="form-select"></select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6 position-relative">
+                                            <label class="form-label">بلد الإقامة</label>
+                                            <select id="country_of_residence" class="form-select"></select>
+                                        </div>
+                                        <div class="col-md-6 position-relative">
+                                            <label class="form-label">المهنة</label>
+                                            <select id="profession" class="form-select"></select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6 position-relative">
+                                            <label class="form-label">الجنس</label>
+                                            <select id="gender" class="form-select"></select>
+                                        </div>
+                                        <div class="col-md-6 position-relative">
+                                            <label class="form-label">نوع الجواز</label>
+                                            <select id="passport_type" class="form-select"></select>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div> <!-- End .view-content -->
+
+                <!-- Bottom Actions -->
+                <div class="bottom-actions">
+                    <div class="d-flex justify-content-center gap-3">
+                        <button id="btnSendToExtension" class="btn-ox btn-primary-ox btn-lg px-5">
+                            <i class="bi bi-send-fill"></i> إرسال البيانات
+                        </button>
+                        <button type="button" class="btn-ox btn-danger-ox btn-lg px-5" onclick="clearInputFields()">
+                            <i class="bi bi-trash"></i> تفريغ الحقول
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- VIEW: HISTORY -->
+            <div id="view-history" class="view-section">
+                <div class="view-content">
+                    <div class="page-header mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="page-title fs-5 fw-bold">سجل العمليات</div>
+                        <button class="btn-ox btn-danger-ox btn-sm" id="btnClearHistory">
+                            <i class="bi bi-trash"></i> حذف جميع السجلات
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="ox-card p-0 overflow-hidden bg-white rounded shadow-sm">
+                    <div class="history-table-container">
+                        <table class="table w-100 mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>التاريخ</th>
+                                    <th>الاسم</th>
+                                    <th>رقم الجواز</th>
+                                    <th class="text-end">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div> <!-- End .view-content -->
+            </div>
+
+            <!-- VIEW: SETTINGS -->
+            <div id="view-settings" class="view-section">
+                <div class="view-content">
+                    <div class="page-header mb-3">
+                    <div class="page-title fs-5 fw-bold">الإعدادات</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="ox-card bg-white p-4 rounded shadow-sm">
+                            <h5 class="mb-4 fw-bold">إعدادات الاتصال (API)</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Google Gemini API Key</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key"></i></span>
+                                    <input type="password" id="inputApiKey" class="form-control border-start-0" placeholder="AIza...">
+                                </div>
+                                <div class="form-text small">مفتاح الربط الخاص بخدمة Google Gemini AI.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">اسم الموديل (Model Name)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-cpu"></i></span>
+                            <input type="text" id="inputModelName" class="form-control border-start-0" placeholder="gemini-3-flash-preview" value="gemini-3-flash-preview">
+                        </div>
+                        <div class="form-text small">النسخة المتوفرة حالياً: gemini-3-flash-preview</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">إصدار API (API Version)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-code-slash"></i></span>
+                                    <input type="text" id="inputApiVersion" class="form-control border-start-0" placeholder="v1beta" value="v1beta">
+                                </div>
+                                <div class="form-text small">مثال: v1beta</div>
+                            </div>
+
+                            <button id="btnSaveApiKey" class="btn-ox btn-primary-ox w-100 mt-2">
+                                <i class="bi bi-save"></i> حفظ الإعدادات
+                            </button>
+                            
+                            <hr class="my-4">
+
+                            <h5 class="mb-3 fw-bold">إعدادات الصوت والتنبيهات</h5>
+                            <div class="form-check form-switch mb-4">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchEnableSounds" checked>
+                                <label class="form-check-label ms-2" for="switchEnableSounds">تفعيل التنبيهات الصوتية</label>
+                            </div>
+                            
+                            <button id="resetApiKeyBtn" class="btn-ox btn-outline-danger w-100">
+                                <i class="bi bi-arrow-counterclockwise"></i> إعادة ضبط المصنع
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="ox-card bg-light p-4 rounded border-0">
+                            <h5 class="mb-3 fw-bold">عن البرنامج</h5>
+                            <p class="text-muted">نظام SwiftScan الذكي (من OMNIX للبرمجيات) لاستخراج بيانات جوازات السفر.</p>
+                            <ul class="list-unstyled text-muted small mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> محرك ذكاء اصطناعي: Gemini Flash Latest</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> دعم كامل للغة العربية</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> ربط مباشر مع المتصفح (Mendix)</li>
+                            </ul>
+
+                            <h6 class="fw-bold mb-3 border-top pt-3">منتجات OMNIX الأخرى:</h6>
+                            <div class="d-flex flex-column gap-3">
+                                <div class="d-flex gap-2 align-items-start">
+                                    <i class="bi bi-building-fill text-primary mt-1"></i>
+                                    <div>
+                                        <strong class="d-block" style="font-size: 0.9rem;">Sales Union Platform</strong>
+                                        <div class="small text-muted" style="font-size: 0.8rem; line-height: 1.4;">منصة شاملة لإدارة النقابات، العضويات، الأخبار، والفعاليات.</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 align-items-start">
+                                    <i class="bi bi-people-fill text-primary mt-1"></i>
+                                    <div>
+                                        <strong class="d-block" style="font-size: 0.9rem;">Workers Manager System</strong>
+                                        <div class="small text-muted" style="font-size: 0.8rem; line-height: 1.4;">نظام متكامل لشركات الاستقدام لإدارة العاملات والعقود.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div> <!-- End .view-content -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar-fixed">
+        <div class="status-indicator">
+            <span id="bridge-indicator-dot" class="dot orange"></span>
+            <span id="bridge-indicator-text">جاري الاتصال بالجسر...</span>
+        </div>
+        <div id="status-text">جاهز للعمل</div>
+        <div>SwiftScan v9.1</div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="ox-modal-overlay" class="d-none">
+        <div class="ox-modal">
+            <div class="ox-modal-header">
+                <div id="ox-modal-title">تنبيه</div>
+            </div>
+            <div class="ox-modal-body">
+                <div id="ox-modal-message"></div>
+            </div>
+            <div class="ox-modal-footer p-3 text-end">
+                <button class="btn btn-secondary d-none" id="ox-modal-cancel">إلغاء</button>
+                <button class="btn btn-primary" id="ox-modal-ok">موافق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="renderer.js"></script>
+</body>
+</html>
