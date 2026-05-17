@@ -37,7 +37,7 @@
             --support-bg: #ffffff;
         }
 
-        /* هذا الكود المبسط يفرض السيطرة على الـ iframe ويخفي الأسهم المزعجة */
+        /* تخصيص شريط التمرير */
         ::-webkit-scrollbar {
             width: 8px !important;
             height: 8px !important;
@@ -57,7 +57,6 @@
             background: rgba(136, 136, 136, 0.5) !important;
         }
 
-        /* السر هنا: هذا السطر يخفي الأسهم العلوية والسفلية لشريط الويندوز الكلاسيكي */
         ::-webkit-scrollbar-button {
             display: none !important;
         }
@@ -81,7 +80,6 @@
         .logo { font-size: 1.8rem; font-weight: 900; letter-spacing: 3px; color: var(--text-main); margin: 0; line-height: 1; } 
         .logo span { color: var(--accent-gold); }
         
-        /* ضبط لون اللوكو حسب الثيم */
         [data-theme='dark'] .logo-img { filter: brightness(0) invert(1); }
         [data-theme='light'] .logo-img { filter: brightness(0); }
 
@@ -356,29 +354,43 @@
         const icon = themeBtn.querySelector('i');
         const htmlElement = document.documentElement;
 
-        themeBtn.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            
-            if (currentTheme === 'dark') {
-                htmlElement.setAttribute('data-theme', 'light');
+        // 1. دالة مركزية لتطبيق الثيم وتحديث الأيقونة بسلاسة
+        function applyTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            if(theme === 'light') {
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
             } else {
-                htmlElement.setAttribute('data-theme', 'dark');
                 icon.classList.remove('fa-moon');
                 icon.classList.add('fa-sun');
             }
+        }
+
+        // 2. عند الضغط على زر الثيم داخل صفحة "حول"
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            // تطبيق الثيم داخلياً
+            applyTheme(newTheme);
+
+            // إرسال رسالة للتطبيق الأب (React) لتغيير ثيم البرنامج بالكامل حتى لا يحدث اختلاف
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'THEME_TOGGLED_FROM_IFRAME', theme: newTheme }, '*');
+            }
         });
 
-        // الاستماع لأمر تغيير الثيم من التطبيق الأصلي (إن وجد)
+        // 3. الاستماع لتغيير الثيم القادم من التطبيق الأب
         window.addEventListener('message', (event) => {
-            if (event.data.type === 'SET_THEME') {
-                htmlElement.setAttribute('data-theme', event.data.theme);
-                if(event.data.theme === 'light') {
-                    icon.classList.replace('fa-sun', 'fa-moon');
-                } else {
-                    icon.classList.replace('fa-moon', 'fa-sun');
-                }
+            if (event.data && event.data.type === 'SET_THEME') {
+                applyTheme(event.data.theme);
+            }
+        });
+
+        // 4. طلب الثيم الحالي من التطبيق الأب بمجرد تحميل الصفحة (لمنع وميض الألوان)
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'IFRAME_READY' }, '*');
             }
         });
     </script>
