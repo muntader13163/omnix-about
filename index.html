@@ -36,6 +36,31 @@
             --feature-bg: #f9f9f9;
             --support-bg: #ffffff;
         }
+        /* 1. تخصيص الحجم الكلي لشريط التمرير */
+::-webkit-scrollbar {
+  width: 8px;               /* عرض شريط التمرير العمودي */
+  height: 8px;              /* ارتفاع شريط التمرير الأفقي */
+}
+
+/* 2. تخصيص الخلفية (المجرى الذي يتحرك فيه الشريط) */
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03); /* خلفية شبه شفافة جداً لتناسب الـ Glassmorphism */
+  border-radius: 10px;
+}
+
+/* 3. تخصيص المقبض (الجزء المتحرك الذي يمسكه المستخدم) */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);  /* لون أبيض شفاف خفيف متناسق مع الإطار */
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05); /* حد رفيع جداً */
+  transition: background 0.3s ease;
+}
+
+/* 4. تغيير لون المقبض عند تمرير الماوس فوقه (Hover) */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25); /* يصبح أوضح قليلاً عند التفاعل */
+}
+
         
         * { box-sizing: border-box; transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease; }
         body { font-family: var(--ar-font); background-color: var(--primary-bg); color: var(--text-main); line-height: 1.8; margin: 0; overflow-x: hidden; } 
