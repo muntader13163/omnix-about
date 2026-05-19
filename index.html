@@ -37,29 +37,19 @@
             --support-bg: #ffffff;
         }
 
+        /* انزلاق سلس للروابط */
+        html { scroll-behavior: smooth; }
+
         /* تخصيص شريط التمرير */
-        ::-webkit-scrollbar {
-            width: 8px !important;
-            height: 8px !important;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--primary-bg) !important; 
-        }
-
+        ::-webkit-scrollbar { width: 8px !important; height: 8px !important; }
+        ::-webkit-scrollbar-track { background: var(--primary-bg) !important; }
         ::-webkit-scrollbar-thumb {
             background: rgba(136, 136, 136, 0.3) !important;
             border-radius: 10px !important;
             border: 2px solid var(--primary-bg) !important;
         }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(136, 136, 136, 0.5) !important;
-        }
-
-        ::-webkit-scrollbar-button {
-            display: none !important;
-        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(136, 136, 136, 0.5) !important; }
+        ::-webkit-scrollbar-button { display: none !important; }
         
         * { box-sizing: border-box; transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease; }
         body { font-family: var(--ar-font); background-color: var(--primary-bg); color: var(--text-main); line-height: 1.8; margin: 0; overflow-x: hidden; } 
@@ -86,6 +76,8 @@
         .nav-controls { display: flex; align-items: center; gap: 20px; font-family: var(--en-font); font-weight: 600; color: var(--text-muted); }
         .theme-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.3rem; transition: 0.3s; }
         .theme-btn:hover { color: var(--accent-gold); transform: scale(1.1); }
+        .nav-link { color: var(--text-main); text-decoration: none; transition: 0.3s; }
+        .nav-link:hover { color: var(--accent-gold); }
 
         /* القسم الرئيسي - Hero */
         .hero { 
@@ -145,94 +137,52 @@
         .visa-text h4 { color: #1fb173; margin: 0 0 10px; font-size: 1.3rem; }
         .visa-text p { color: var(--text-muted); margin: 0; font-size: 1rem; }
 
-        /* قسم الدعم الفني */
-        .support-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 60px; border-radius: 35px; text-align: center; margin: 100px 0; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
-        .support-titles h3 { font-size: 2.2rem; color: var(--text-main); margin: 0 0 15px; }
-        .support-titles p { color: var(--text-muted); font-size: 1.2rem; margin: 0; }
-        .support-links { display: flex; justify-content: center; gap: 50px; margin-top: 40px; flex-wrap: wrap; }
+        /* قسم الدعم الفني ونموذج المراسلة الثابت */
+        .support-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 60px; border-radius: 35px; margin: 100px 0; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .support-header { text-align: center; margin-bottom: 40px; }
+        .support-header h3 { font-size: 2.2rem; color: var(--text-main); margin: 0 0 15px; }
+        .support-header p { color: var(--text-muted); font-size: 1.2rem; margin: 0; }
+        .support-links { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; margin-bottom: 50px; }
         .s-link { color: var(--text-main); text-decoration: none; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; font-weight: 600; }
         .s-link:hover { color: var(--accent-gold); transform: translateY(-3px); }
 
-        /* --- تنسيقات صندوق المراسلة العائم --- */
-        .tg-float-btn {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 60px;
-            height: 60px;
-            background: #0088cc;
-            color: white;
-            border-radius: 50%;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.3s ease;
-        }
-        .tg-float-btn:hover { transform: scale(1.1); }
-
-        .tg-chat-widget {
-            position: fixed;
-            bottom: 100px;
-            left: 30px;
-            width: 320px;
-            background: var(--card-bg);
+        .contact-form-container {
+            background: var(--feature-bg);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 9998;
-            overflow: hidden;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
+            padding: 40px;
+            border-radius: 25px;
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .tg-chat-widget.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .tg-header {
-            background: #0088cc;
-            color: white;
-            padding: 15px 20px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .tg-header button {
-            background: none; border: none; color: white; cursor: pointer; font-size: 18px;
-        }
-
-        .tg-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .tg-body input, .tg-body textarea {
+        .contact-form-container h4 { margin: 0 0 25px; font-size: 1.5rem; color: var(--accent-blue); text-align: center; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .static-form input, .static-form textarea {
             width: 100%;
-            padding: 10px 15px;
+            padding: 15px 20px;
             border: 1px solid var(--border-color);
             background: var(--primary-bg);
             color: var(--text-main);
-            border-radius: 8px;
+            border-radius: 12px;
             font-family: inherit;
+            font-size: 1rem;
         }
-        .tg-body textarea { resize: none; height: 100px; }
-        .tg-body input:focus, .tg-body textarea:focus {
-            outline: none; border-color: #0088cc;
+        .static-form input:focus, .static-form textarea:focus { outline: none; border-color: var(--accent-blue); }
+        .static-form textarea { resize: vertical; min-height: 120px; margin-bottom: 20px; }
+        
+        .send-btn {
+            background: var(--accent-blue); color: #000; border: none; padding: 15px 40px;
+            border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.1rem;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: 0.3s; width: 100%; font-family: inherit;
         }
+        .send-btn:hover { background: #00b3e6; transform: translateY(-2px); }
+        #tg-status-msg { margin: 15px 0 0; font-size: 1rem; text-align: center; display: none; font-weight: bold; }
 
-        #tg-send-btn {
-            background: #0088cc; color: white; border: none; padding: 12px;
-            border-radius: 8px; cursor: pointer; font-weight: bold; display: flex;
-            justify-content: center; align-items: center; gap: 10px; transition: 0.3s;
-            font-family: inherit;
-        }
-        #tg-send-btn:hover { background: #0077b3; }
-        #tg-status-msg { margin: 0; font-size: 0.9rem; text-align: center; display: none; }
+        /* الفوتر */
+        footer { padding: 80px 0 40px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); background: var(--card-bg); }
+        .footer-brand { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
+        footer p { font-size: 0.95rem; margin: 5px 0; }
 
         @media (max-width: 992px) {
             .bilingual-block { grid-template-columns: 1fr; gap: 50px; }
@@ -245,7 +195,9 @@
             .stats-bar { flex-direction: column; gap: 30px; padding: 30px; }
             .visa-callout { flex-direction: column; text-align: center; }
             .support-links { gap: 20px; flex-direction: column; align-items: center; }
-            .tg-chat-widget { width: calc(100% - 60px); left: 30px; right: 30px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .contact-form-container { padding: 25px; }
+            .nav-link { display: none; } /* إخفاء النص في الجوال لتوفير مساحة */
         }
     </style>
 </head>
@@ -258,6 +210,7 @@
                 <div class="logo">OMNI<span>X</span></div>
             </div>
             <div class="nav-controls">
+                <a href="#support-section" class="nav-link"><i class="fas fa-headset"></i> الدعم الفني</a>
                 <span>AR | EN</span>
                 <button class="theme-btn" id="themeToggle" title="تبديل المظهر">
                     <i class="fas fa-sun"></i>
@@ -394,20 +347,32 @@
             </div>
         </div>
 
-        <div class="support-box">
-            <div class="support-titles">
+        <div class="support-box" id="support-section">
+            <div class="support-header">
                 <div lang="ar">
                     <h3>تواصل مع خبراء OMNIX</h3>
                     <p>نحن هنا لمساعدتك في أتمتة وتطوير أعمال شركتك لتواكب العصر الرقمي.</p>
                 </div>
-                <div lang="en" style="margin-top: 30px;">
-                    <h3>Connect with OMNIX Experts</h3>
-                    <p>We are here to help you automate and advance your business to keep pace with the digital era.</p>
-                </div>
             </div>
+            
             <div class="support-links">
                 <a href="https://wa.me/9647818558459" class="s-link" target="_blank"><i class="fab fa-whatsapp"></i> 07818558459</a>
                 <a href="https://wa.me/9647729638139" class="s-link" target="_blank"><i class="fab fa-whatsapp"></i> 07729638139</a>
+            </div>
+
+            <div class="contact-form-container" lang="ar">
+                <h4><i class="fab fa-telegram-plane"></i> أرسل رسالة مباشرة للدعم</h4>
+                <div class="static-form">
+                    <div class="form-grid">
+                        <input type="text" id="tg-sender-name" placeholder="الاسم (مطلوب)" required>
+                        <input type="tel" id="tg-sender-phone" placeholder="رقم الهاتف (مطلوب)" required>
+                    </div>
+                    <input type="text" id="tg-sender-license" placeholder="رقم الرخصة (إن وجد - اختياري)" style="margin-bottom: 20px;">
+                    <textarea id="tg-message-text" placeholder="اكتب استفسارك أو المشكلة هنا... (مطلوب)" required></textarea>
+                    
+                    <button id="tg-send-btn" class="send-btn">إرسال الرسالة عبر السيرفر <i class="fas fa-paper-plane"></i></button>
+                    <p id="tg-status-msg"></p>
+                </div>
             </div>
         </div>
 
@@ -426,30 +391,11 @@
         </div>
     </footer>
 
-    <button id="tg-toggle-btn" class="tg-float-btn" title="راسلنا">
-        <i class="fab fa-telegram-plane"></i>
-    </button>
-
-    <div id="tg-chat-box" class="tg-chat-widget">
-        <div class="tg-header">
-            <span><i class="fab fa-telegram"></i> تواصل معنا مباشرة</span>
-            <button id="tg-close-btn"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="tg-body">
-            <input type="text" id="tg-sender-name" placeholder="اسمك الكريم" required>
-            <input type="text" id="tg-sender-phone" placeholder="رقم الهاتف (اختياري)">
-            <textarea id="tg-message-text" placeholder="اكتب استفسارك هنا..." required></textarea>
-            <button id="tg-send-btn">إرسال الرسالة <i class="fas fa-paper-plane"></i></button>
-            <p id="tg-status-msg"></p>
-        </div>
-    </div>
-
     <script>
         const themeBtn = document.getElementById('themeToggle');
         const icon = themeBtn.querySelector('i');
         const htmlElement = document.documentElement;
 
-        // 1. دالة مركزية لتطبيق الثيم وتحديث الأيقونة بسلاسة
         function applyTheme(theme) {
             htmlElement.setAttribute('data-theme', theme);
             if(theme === 'light') {
@@ -461,28 +407,21 @@
             }
         }
 
-        // 2. عند الضغط على زر الثيم داخل صفحة "حول"
         themeBtn.addEventListener('click', () => {
             const currentTheme = htmlElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            // تطبيق الثيم داخلياً
             applyTheme(newTheme);
-
-            // إرسال رسالة للتطبيق الأب (React) لتغيير ثيم البرنامج بالكامل حتى لا يحدث اختلاف
             if (window.parent && window.parent !== window) {
                 window.parent.postMessage({ type: 'THEME_TOGGLED_FROM_IFRAME', theme: newTheme }, '*');
             }
         });
 
-        // 3. الاستماع لتغيير الثيم القادم من التطبيق الأب
         window.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'SET_THEME') {
                 applyTheme(event.data.theme);
             }
         });
 
-        // 4. طلب الثيم الحالي من التطبيق الأب بمجرد تحميل الصفحة (لمنع وميض الألوان)
         window.addEventListener('DOMContentLoaded', () => {
             if (window.parent && window.parent !== window) {
                 window.parent.postMessage({ type: 'IFRAME_READY' }, '*');
@@ -490,37 +429,36 @@
         });
 
         // ==========================================
-        // أكواد صندوق المراسلة مع Supabase
+        // أكواد المراسلة الثابتة مع Supabase
         // ==========================================
         const SUPABASE_URL = 'https://jyjyuqbiftiiuudvlprd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5anl1cWJpZnRpaXV1ZHZscHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMDMyNzMsImV4cCI6MjA5NDc3OTI3M30.ZDt6OuEiOJ2a4wWhO0AHHZpX-GED9w2qtc0Iy2BN-0Y';
 
-        const tgToggleBtn = document.getElementById('tg-toggle-btn');
-        const tgCloseBtn = document.getElementById('tg-close-btn');
-        const tgWidget = document.getElementById('tg-chat-box'); 
         const tgSendBtn = document.getElementById('tg-send-btn');
         const tgStatusMsg = document.getElementById('tg-status-msg');
 
-        // فتح وإغلاق الصندوق
-        tgToggleBtn.addEventListener('click', () => tgWidget.classList.toggle('active'));
-        tgCloseBtn.addEventListener('click', () => tgWidget.classList.remove('active'));
-
-        // دالة إرسال الرسالة إلى السوبا بيس
         tgSendBtn.addEventListener('click', async () => {
             const name = document.getElementById('tg-sender-name').value.trim();
             const phone = document.getElementById('tg-sender-phone').value.trim();
-            const message = document.getElementById('tg-message-text').value.trim();
+            const license = document.getElementById('tg-sender-license').value.trim();
+            const rawMessage = document.getElementById('tg-message-text').value.trim();
 
-            if (!name || !message) {
-                showMessage('يرجى كتابة الاسم والرسالة.', 'red');
+            // التحقق من الحقول الإلزامية
+            if (!name || !phone || !rawMessage) {
+                showMessage('يرجى تعبئة جميع الحقول المطلوبة (الاسم، رقم الهاتف، والرسالة).', 'red');
                 return;
+            }
+
+            // دمج رقم الرخصة مع الرسالة (خدعة لتجنب تعديل قاعدة البيانات)
+            let finalMessage = rawMessage;
+            if (license) {
+                finalMessage = `🔑 رقم الرخصة: ${license}\n\n📝 تفاصيل الرسالة:\n${rawMessage}`;
             }
 
             try {
                 tgSendBtn.innerHTML = 'جاري الإرسال... <i class="fas fa-spinner fa-spin"></i>';
                 tgSendBtn.disabled = true;
 
-                // إرسال البيانات إلى جدول contact_messages في Supabase
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/contact_messages`, {
                     method: 'POST',
                     headers: {
@@ -531,32 +469,28 @@
                     },
                     body: JSON.stringify({
                         name: name,
-                        phone: phone || 'لم يحدد',
-                        message: message
+                        phone: phone,
+                        message: finalMessage
                     })
                 });
 
                 if (response.ok) {
                     showMessage('تم إرسال رسالتك بنجاح!', '#1fb173');
                     
-                    // تفريغ الحقول
+                    // تفريغ الحقول بعد الإرسال الناجح
                     document.getElementById('tg-sender-name').value = '';
                     document.getElementById('tg-sender-phone').value = '';
+                    document.getElementById('tg-sender-license').value = '';
                     document.getElementById('tg-message-text').value = '';
                     
-                    // إغلاق الصندوق بعد ثانيتين
-                    setTimeout(() => {
-                        tgWidget.classList.remove('active');
-                        tgStatusMsg.style.display = 'none';
-                    }, 2000);
+                    setTimeout(() => { tgStatusMsg.style.display = 'none'; }, 4000);
                 } else {
                     throw new Error('حدث خطأ في الإرسال');
                 }
             } catch (error) {
                 showMessage('فشل الإرسال، يرجى المحاولة لاحقاً.', 'red');
-                console.error('Error:', error);
             } finally {
-                tgSendBtn.innerHTML = 'إرسال الرسالة <i class="fas fa-paper-plane"></i>';
+                tgSendBtn.innerHTML = 'إرسال الرسالة عبر السيرفر <i class="fas fa-paper-plane"></i>';
                 tgSendBtn.disabled = false;
             }
         });
