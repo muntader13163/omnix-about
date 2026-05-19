@@ -370,7 +370,7 @@
                     <input type="text" id="tg-sender-license" placeholder="رقم الرخصة (إن وجد - اختياري)" style="margin-bottom: 20px;">
                     <textarea id="tg-message-text" placeholder="اكتب استفسارك أو المشكلة هنا... (مطلوب)" required></textarea>
                     
-                    <button id="tg-send-btn" class="send-btn">إرسال الرسالة عبر السيرفر <i class="fas fa-paper-plane"></i></button>
+                    <button id="tg-send-btn" class="send-btn">إرسال الرسالة<i class="fas fa-paper-plane"></i></button>
                     <p id="tg-status-msg"></p>
                 </div>
             </div>
@@ -450,12 +450,7 @@
             }
 
             // دمج رقم الرخصة مع الرسالة (خدعة لتجنب تعديل قاعدة البيانات)
-            let finalMessage = rawMessage;
-            if (license) {
-                finalMessage = `🔑 رقم الرخصة: ${license}\n\n📝 تفاصيل الرسالة:\n${rawMessage}`;
-            }
-
-            try {
+           try {
                 tgSendBtn.innerHTML = 'جاري الإرسال... <i class="fas fa-spinner fa-spin"></i>';
                 tgSendBtn.disabled = true;
 
@@ -470,7 +465,8 @@
                     body: JSON.stringify({
                         name: name,
                         phone: phone,
-                        message: finalMessage
+                        license: license || null, // إرسال الرخصة كحقل منفصل
+                        message: rawMessage       // إرسال الرسالة الأصلية
                     })
                 });
 
@@ -490,7 +486,7 @@
             } catch (error) {
                 showMessage('فشل الإرسال، يرجى المحاولة لاحقاً.', 'red');
             } finally {
-                tgSendBtn.innerHTML = 'إرسال الرسالة  <i class="fas fa-paper-plane"></i>';
+                tgSendBtn.innerHTML = 'إرسال الرسالة<i class="fas fa-paper-plane"></i>';
                 tgSendBtn.disabled = false;
             }
         });
