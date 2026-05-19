@@ -153,10 +153,86 @@
         .s-link { color: var(--text-main); text-decoration: none; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; font-weight: 600; }
         .s-link:hover { color: var(--accent-gold); transform: translateY(-3px); }
 
-        /* الفوتر */
-        footer { padding: 80px 0 40px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); background: var(--card-bg); }
-        .footer-brand { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
-        footer p { font-size: 0.95rem; margin: 5px 0; }
+        /* --- تنسيقات صندوق المراسلة العائم --- */
+        .tg-float-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: #0088cc;
+            color: white;
+            border-radius: 50%;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        .tg-float-btn:hover { transform: scale(1.1); }
+
+        .tg-chat-widget {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            width: 320px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9998;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        .tg-chat-widget.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .tg-header {
+            background: #0088cc;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tg-header button {
+            background: none; border: none; color: white; cursor: pointer; font-size: 18px;
+        }
+
+        .tg-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .tg-body input, .tg-body textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            background: var(--primary-bg);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+        .tg-body textarea { resize: none; height: 100px; }
+        .tg-body input:focus, .tg-body textarea:focus {
+            outline: none; border-color: #0088cc;
+        }
+
+        #tg-send-btn {
+            background: #0088cc; color: white; border: none; padding: 12px;
+            border-radius: 8px; cursor: pointer; font-weight: bold; display: flex;
+            justify-content: center; align-items: center; gap: 10px; transition: 0.3s;
+            font-family: inherit;
+        }
+        #tg-send-btn:hover { background: #0077b3; }
+        #tg-status-msg { margin: 0; font-size: 0.9rem; text-align: center; display: none; }
 
         @media (max-width: 992px) {
             .bilingual-block { grid-template-columns: 1fr; gap: 50px; }
@@ -169,6 +245,7 @@
             .stats-bar { flex-direction: column; gap: 30px; padding: 30px; }
             .visa-callout { flex-direction: column; text-align: center; }
             .support-links { gap: 20px; flex-direction: column; align-items: center; }
+            .tg-chat-widget { width: calc(100% - 60px); left: 30px; right: 30px; }
         }
     </style>
 </head>
@@ -329,8 +406,8 @@
                 </div>
             </div>
             <div class="support-links">
-                <a href="mailto:muntader13163@gmail.com" class="s-link"><i class="fas fa-envelope"></i> muntader13163@gmail.com</a>
-                <a href="https://wa.me/9647818558459" class="s-link"><i class="fab fa-whatsapp"></i> 07818558459</a>
+                <a href="https://wa.me/9647818558459" class="s-link" target="_blank"><i class="fab fa-whatsapp"></i> 07818558459</a>
+                <a href="https://wa.me/9647729638139" class="s-link" target="_blank"><i class="fab fa-whatsapp"></i> 07729638139</a>
             </div>
         </div>
 
@@ -348,6 +425,24 @@
             <p style="margin-top: 15px; font-size: 0.8rem; color: var(--accent-gold);">بناء وتطوير: م. منتظر وسام | OMNIX AI v1.5</p>
         </div>
     </footer>
+
+    <button id="tg-toggle-btn" class="tg-float-btn" title="راسلنا">
+        <i class="fab fa-telegram-plane"></i>
+    </button>
+
+    <div id="tg-chat-box" class="tg-chat-widget">
+        <div class="tg-header">
+            <span><i class="fab fa-telegram"></i> تواصل معنا مباشرة</span>
+            <button id="tg-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="tg-body">
+            <input type="text" id="tg-sender-name" placeholder="اسمك الكريم" required>
+            <input type="text" id="tg-sender-phone" placeholder="رقم الهاتف (اختياري)">
+            <textarea id="tg-message-text" placeholder="اكتب استفسارك هنا..." required></textarea>
+            <button id="tg-send-btn">إرسال الرسالة <i class="fas fa-paper-plane"></i></button>
+            <p id="tg-status-msg"></p>
+        </div>
+    </div>
 
     <script>
         const themeBtn = document.getElementById('themeToggle');
@@ -393,6 +488,84 @@
                 window.parent.postMessage({ type: 'IFRAME_READY' }, '*');
             }
         });
+
+        // ==========================================
+        // أكواد صندوق المراسلة مع Supabase
+        // ==========================================
+        const SUPABASE_URL = 'https://jyjyuqbiftiiuudvlprd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5anl1cWJpZnRpaXV1ZHZscHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMDMyNzMsImV4cCI6MjA5NDc3OTI3M30.ZDt6OuEiOJ2a4wWhO0AHHZpX-GED9w2qtc0Iy2BN-0Y';
+
+        const tgToggleBtn = document.getElementById('tg-toggle-btn');
+        const tgCloseBtn = document.getElementById('tg-close-btn');
+        const tgWidget = document.getElementById('tg-chat-box'); 
+        const tgSendBtn = document.getElementById('tg-send-btn');
+        const tgStatusMsg = document.getElementById('tg-status-msg');
+
+        // فتح وإغلاق الصندوق
+        tgToggleBtn.addEventListener('click', () => tgWidget.classList.toggle('active'));
+        tgCloseBtn.addEventListener('click', () => tgWidget.classList.remove('active'));
+
+        // دالة إرسال الرسالة إلى السوبا بيس
+        tgSendBtn.addEventListener('click', async () => {
+            const name = document.getElementById('tg-sender-name').value.trim();
+            const phone = document.getElementById('tg-sender-phone').value.trim();
+            const message = document.getElementById('tg-message-text').value.trim();
+
+            if (!name || !message) {
+                showMessage('يرجى كتابة الاسم والرسالة.', 'red');
+                return;
+            }
+
+            try {
+                tgSendBtn.innerHTML = 'جاري الإرسال... <i class="fas fa-spinner fa-spin"></i>';
+                tgSendBtn.disabled = true;
+
+                // إرسال البيانات إلى جدول contact_messages في Supabase
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/contact_messages`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        phone: phone || 'لم يحدد',
+                        message: message
+                    })
+                });
+
+                if (response.ok) {
+                    showMessage('تم إرسال رسالتك بنجاح!', '#1fb173');
+                    
+                    // تفريغ الحقول
+                    document.getElementById('tg-sender-name').value = '';
+                    document.getElementById('tg-sender-phone').value = '';
+                    document.getElementById('tg-message-text').value = '';
+                    
+                    // إغلاق الصندوق بعد ثانيتين
+                    setTimeout(() => {
+                        tgWidget.classList.remove('active');
+                        tgStatusMsg.style.display = 'none';
+                    }, 2000);
+                } else {
+                    throw new Error('حدث خطأ في الإرسال');
+                }
+            } catch (error) {
+                showMessage('فشل الإرسال، يرجى المحاولة لاحقاً.', 'red');
+                console.error('Error:', error);
+            } finally {
+                tgSendBtn.innerHTML = 'إرسال الرسالة <i class="fas fa-paper-plane"></i>';
+                tgSendBtn.disabled = false;
+            }
+        });
+
+        function showMessage(msg, color) {
+            tgStatusMsg.style.display = 'block';
+            tgStatusMsg.style.color = color;
+            tgStatusMsg.textContent = msg;
+        }
     </script>
 </body> 
 </html>
